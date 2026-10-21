@@ -1,0 +1,2 @@
+# No external deps - pure python for Anna execution
+# Anna OS already includes hashlib, json, time

@@ -1,0 +1,25 @@
+{
+  "name": "VENDIX AI",
+  "slug": "vendix-ai",
+  "display_name": "VENDIX AI - Autonomous Vendor Risk & Compliance Governance Agent",
+  "description": "Enterprise-grade autonomous agent that evaluates vendor risk across 12 compliance policies (SOC2, ISO27001, Data Residency, Payment Terms, Security Posture) and enforces human-in-the-loop approval with SHA256 tamper-proof audit trail. Built for procurement & compliance teams.",
+  "version": "2.0.0",
+  "author": "Raveena Sharma",
+  "category": "Enterprise & Compliance",
+  "tags": ["vendor-risk", "compliance", "governance", "SOC2", "ISO27001", "procurement"],
+  "entry_point": "main.py",
+  "primary_function": "run_governance_pipeline",
+  "frontend": "frontend/index.html",
+  "runtime": "python3.11",
+  "permissions": ["execute_code", "store_audit_logs"],
+  "requirements": "requirements.txt",
+  "qualified_run_definition": "A Qualified App Run is counted when a signed-in user submits a vendor payload and receives a complete risk_assessment with score, level, flags, and audit_hash_sha256",
+  "demo_vendor": {
+    "vendor_name": "Apex Cloud Analytics",
+    "contract_value_usd": 120000,
+    "payment_terms": 60,
+    "soc2_compliant": false,
+    "iso27001": true,
+    "annual_revenue_usd": 1200000
+  }
+}

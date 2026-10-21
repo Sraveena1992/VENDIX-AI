@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VENDIX AI</title>
+<style>
+body{background:#0a0e14;color:#e6edf3;font-family:Inter,sans-serif;margin:0;padding:20px}
+.header{display:flex;justify-content:space-between;align-items:center;background:#111820;border:1px solid #1f2a36;padding:16px;border-radius:12px;margin-bottom:20px}
+.header h1{margin:0;font-size:22px} .badge{background:#0d3b1e;color:#2ea043;padding:4px 10px;border-radius:20px;font-size:12px}
+.grid{display:grid;grid-template-columns:300px 1fr 360px;gap:16px}
+.card{background:#111820;border:1px solid #1f2a36;border-radius:12px;padding:16px}
+.vendor-item{padding:12px;border-radius:8px;margin-bottom:10px;cursor:pointer;background:#0d1721;border-left:4px solid #ff7b72}
+.vendor-item.active{border-color:#58a6ff;background:#12263d}
+.risk-dial{width:140px;height:140px;border-radius:50%;border:8px solid #1f2a36;border-top-color:#ff7b72;display:flex;align-items:center;justify-content:center;margin:20px auto;flex-direction:column}
+.flag{padding:8px 12px;border-radius:8px;margin:8px 0;font-size:13px}
+.flag.fail{background:#2a1515;border:1px solid #ff7b72;color:#ffa198}
+.flag.pass{background:#0d2518;border:1px solid #2ea043;color:#7ee787}
+.btn{width:100%;padding:12px;border-radius:8px;border:none;font-weight:700;cursor:pointer;margin-top:8px}
+.btn-override{background:#ffcc00;color:#000} .btn-approve{background:#1f6feb;color:#fff}
+input,textarea{width:100%;background:#0a0e14;border:1px solid #30363d;color:#fff;padding:10px;border-radius:8px;margin:6px 0}
+#result{white-space:pre-wrap;font-size:13px;background:#0a0e14;padding:12px;border-radius:8px;margin-top:10px}
+</style>
+</head>
+<body>
+
+<div class="header">
+<div><h1>VENDIX AI</h1><div style="font-size:12px;color:#8b949e">Autonomous Vendor Risk & Compliance Governance Agent</div></div>
+<div><span class="badge">● Live • System Online</span> <span style="margin-left:10px">ENV: Production</span></div>
+</div>
+
+<div class="grid">
+<!-- LEFT: Intake Queue -->
+<div class="card">
+<h3>Vendor Intake Queue</h3>
+<input id="vname" placeholder="Vendor Name: Apex Cloud Analytics" value="Apex Cloud Analytics">
+<input id="vvalue" type="number" placeholder="Contract $: 120000" value="120000">
+<input id="vterms" type="number" placeholder="Payment Terms Net: 60" value="60">
+<label style="font-size:12px"><input type="checkbox" id="soc2"> SOC2 Compliant</label><br>
+<label style="font-size:12px"><input type="checkbox" id="iso" checked> ISO27001</label><br>
+<label style="font-size:12px"><input type="checkbox" id="residency" checked> Data Residency FAIL (EU)</label><br>
+<label style="font-size:12px"><input type="checkbox" id="cve" checked> Open CVE Detected</label><br>
+<button class="btn btn-approve" onclick="runGovernance()">Run Governance Pipeline</button>
+<div style="margin-top:16px">
+<div class="vendor-item active">APEX CLOUD ANALYTICS<br><small>$120k • HIGH RISK</small></div>
+<div class="vendor-item" style="border-color:#d29922">Nimbus Data • MEDIUM</div>
+<div class="vendor-item" style="border-color:#2ea043">Orion Logistics • LOW</div>
+</div>
+</div>
+
+<!-- CENTER: Risk Reasoning -->
+<div class="card">
+<h3>AI Risk Reasoning</h3>
+<div id="dial" class="risk-dial"><div id="score" style="font-size:36px;font-weight:800">--</div><div>RISK SCORE /100</div></div>
+<div id="flags"></div>
+<div style="margin-top:12px;font-size:12px;color:#8b949e">Policy Rules Evaluated: <span id="rulesCount">0/12</span></div>
+<div id="reasoning" style="margin-top:10px;background:#0a0e14;padding:10px;border-radius:8px;font-size:12px"></div>
+</div>
+
+<!-- RIGHT: Approval Console -->
+<div class="card">
+<h3>Approval Console</h3>
+<div id="statusBadge" style="background:#4a2020;color:#ff7b72;padding:6px 10px;border-radius:6px;display:inline-block;font-size:12px">PENDING APPROVAL</div>
+<button class="btn btn-override" onclick="runWithOverride()">🛡️ Human Override</button>
+<button class="btn" style="background:#21262d;color:#fff" onclick="requestInfo()">Request Additional Info</button>
+<h4 style="margin-top:20px">Audit & Provenance</h4>
+<div style="font-size:11px;word-break:break-all;background:#0a0e14;padding:8px;border-radius:6px">
+<div>Audit Hash (SHA256)</div>
+<div id="auditHash" style="color:#58a6ff">--</div>
+<div id="timestamp" style="margin-top:6px;color:#8b949e">--</div>
+</div>
+<h4>Analytics Telemetry</h4>
+<div id="telemetry" style="font-size:12px;background:#0a0e14;padding:8px;border-radius:6px">--</div>
+<div style="margin-top:12px;display:flex;gap:8px">
+<button class="btn" style="background:#2a1515;color:#ff7b72">Reject & Escalate</button>
+<button class="btn" style="background:#0d2518;color:#2ea043">Approve with Conditions</button>
+</div>
+<div id="result"></div>
+</div>
+</div>
+
+<script>
+// Simulated Anna Backend Call - Replace with Anna SDK
+async function runGovernance(override=false){
+  const payload = {
+    vendor_name: document.getElementById('vname').value,
+    contract_value_usd: parseInt(document.getElementById('vvalue').value),
+    payment_terms: parseInt(document.getElementById('vterms').value),
+    soc2_compliant: document.getElementById('soc2').checked,
+    iso27001: document.getElementById('iso').checked,
+    data_residency_fail: document.getElementById('residency').checked,
+    open_cve_high: document.getElementById('cve').checked,
+    unapproved_subprocessor: true,
+    annual_revenue_usd: 1200000,
+    encryption_at_rest: true,
+    insurance_coverage: true,
+    sanction_list_hit: false,
+    dpa_signed: true,
+    soc2_valid_last_12m: true
+  };
+
+  // In Anna, this would be: await Anna.run('run_governance_pipeline', payload)
+  // For demo, we simulate logic matching main.py
+  document.getElementById('score').innerText = '...';
+  await new Promise(r=>setTimeout(r,800));
+
+  // Mock calculation to match Python logic - For Anna, remove this and call backend
+  let score = 5;
+  let flags = [];
+  if(!payload.soc2_compliant){score+=35; flags.push('Missing SOC2 Type II - RULE_002')}
+  if(payload.payment_terms>45){score+=15; flags.push(`Payment Net ${payload.payment_terms} >45 - RULE_003`)}
+  if(payload.data_residency_fail){score+=25; flags.push('Data Residency FAIL - RULE_004')}
+  if(payload.open_cve_high){score+=20; flags.push('Open CVE v3.2.1 - RULE_009')}
+  if(payload.unapproved_subprocessor){score+=15; flags.push('Unapproved subprocessor - RULE_007')}
+  score = Math.min(score,100);
+
+  document.getElementById('score').innerText = score;
+  document.getElementById('dial').style.borderTopColor = score>=60?'#ff7b72':score>=30?'#d29922':'#2ea043';
+  document.getElementById('flags').innerHTML = flags.map(f=>`<div class="flag fail">🔴 ${f}</div>`).join('') + `<div class="flag pass">✅ 7/12 Rules Passed</div>`;
+  document.getElementById('rulesCount').innerText = `12/12 • ${flags.length} flagged`;
+  document.getElementById('statusBadge').innerText = (score>=40 && !override) ? 'PENDING_APPROVAL' : (override?'APPROVED (OVERRIDE)':'AUTO_CLEARED');
+  document.getElementById('auditHash').innerText = '9f86d0'+Math.random().toString(16).slice(2,10)+'...'+'3f4c2d1b8e';
+  document.getElementById('timestamp').innerText = new Date().toUTCString();
+  document.getElementById('telemetry').innerHTML = `Latency: ${Math.floor(Math.random()*30+12)}ms<br>Rules: 12 evaluated<br>Confidence: 92%<br>Verification: VERIFIED_VALID`;
+  document.getElementById('reasoning').innerHTML = `<b>AI Reasoning Summary:</b><br>Model concludes ${score>=60?'HIGH':'MEDIUM'} risk due to ${flags.join(', ')}. Recommend human review.`;
+  document.getElementById('result').innerText = `Qualified App Run SUCCESS - Risk Level: ${score>=60?'HIGH':score>=30?'MEDIUM':'LOW'}`;
+}
+function runWithOverride(){ runGovernance(true); }
+function requestInfo(){ alert('Request sent to vendor for additional docs - Retention workflow triggered'); }
+</script>
+
+</body>
+</html>

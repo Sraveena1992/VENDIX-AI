@@ -1,152 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>VENDIX AI</title>
 <style>
-body{background:#0a0e14;color:#e6edf3;font-family:Inter,sans-serif;margin:0;padding:20px}
-.header{display:flex;justify-content:space-between;align-items:center;background:#111820;border:1px solid #1f2a36;padding:16px;border-radius:12px;margin-bottom:20px}
-.header h1{margin:0;font-size:22px} .badge{background:#0d3b1e;color:#2ea043;padding:4px 10px;border-radius:20px;font-size:12px}
-.grid{display:grid;grid-template-columns:300px 1fr 360px;gap:16px}
-.card{background:#111820;border:1px solid #1f2a36;border-radius:12px;padding:16px}
-.vendor-item{padding:12px;border-radius:8px;margin-bottom:10px;cursor:pointer;background:#0d1721;border-left:4px solid #ff7b72;transition:0.2s}
-.vendor-item.active{border-color:#58a6ff;background:#12263d}
-.risk-dial{width:150px;height:150px;border-radius:50%;border:8px solid #1f2a36;border-top-color:#ff7b72;display:flex;align-items:center;justify-content:center;margin:20px auto;flex-direction:column;text-align:center;padding:10px}
-.flag{padding:8px 12px;border-radius:8px;margin:8px 0;font-size:13px;line-height:1.4}
-.flag.fail{background:#2a1515;border:1px solid #ff7b72;color:#ffa198}
-.flag.pass{background:#0d2518;border:1px solid #2ea043;color:#7ee787}
-.btn{width:100%;padding:12px;border-radius:8px;border:none;font-weight:700;cursor:pointer;margin-top:8px}
-.btn-override{background:#ffcc00;color:#000} .btn-approve{background:#1f6feb;color:#fff}
-input,textarea{width:100%;background:#0a0e14;border:1px solid #30363d;color:#fff;padding:10px;border-radius:8px;margin:6px 0}
-#result{white-space:pre-wrap;font-size:13px;background:#0a0e14;padding:12px;border-radius:8px;margin-top:10px}
-</style>
-</head>
+:root{--bg:#0b111e;--card:#131d32;--line:#22314f;--blue:#2f6bff;--yellow:#ffb020}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#e6ecff;font-family:Inter,Segoe UI,sans-serif}
+.top{display:flex;justify-content:space-between;padding:12px 18px;background:#0e1628;border-bottom:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:320px 1fr 360px;gap:14px;padding:14px;min-height:90vh}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+input{width:100%;background:#0b111e;border:1px solid var(--line);color:#fff;padding:8px 10px;border-radius:8px;margin:6px 0}
+.circle-wrap{display:flex;justify-content:center;margin:20px 0}
+.circle{width:170px;height:170px;border-radius:50%;border:8px solid #1e2d4d;border-top-color:#ff4d4d;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px}
+.score{font-size:42px;font-weight:800;line-height:1}
+.rlabel{font-size:10px;opacity:.7;margin-top:4px;max-width:130px;line-height:1.1;word-wrap:break-word;text-align:center}
+.btn{width:100%;padding:10px;border-radius:9px;border:none;font-weight:700;cursor:pointer;margin-top:8px}
+.blue{background:var(--blue);color:#fff}.yellow{background:var(--yellow);color:#000}.dark{background:#1b2845;color:#cbd6f5}
+.flag{border-left:3px solid #ff4d4d;background:#0f1a30;padding:7px 9px;border-radius:6px;margin:5px 0;font-size:12px}
+.hash{font-family:monospace;font-size:10px;background:#0b111e;padding:8px;border-radius:6px;word-break:break-all;border:1px solid var(--line)}
+</style></head>
 <body>
-
-<div class="header">
-<div><h1>VENDIX AI</h1><div style="font-size:12px;color:#8b949e">Autonomous Vendor Risk & Compliance Governance Agent</div></div>
-<div><span class="badge">● Live • System Online</span> <span style="margin-left:10px;font-size:12px;color:#8b949e">ENV: Production</span></div>
-</div>
-
+<div class="top"><b>VENDIX AI - Autonomous Vendor Risk & Compliance Governance Agent</b><span style="color:#2ecc71;font-size:12px">● Live • System Online</span></div>
 <div class="grid">
-<!-- LEFT: Intake Queue -->
-<div class="card">
-<h3>Vendor Intake Queue</h3>
-<input id="vname" placeholder="Vendor Name" value="Apex Cloud Analytics">
-<input id="vvalue" type="number" placeholder="Contract $" value="120000">
-<input id="vterms" type="number" placeholder="Payment Terms Net" value="60">
-<label style="font-size:12px;display:flex;align-items:center;gap:6px;margin:6px 0"><input type="checkbox" id="soc2"> SOC2 Compliant</label>
-<label style="font-size:12px;display:flex;align-items:center;gap:6px;margin:6px 0"><input type="checkbox" id="iso" checked> ISO27001 Certified</label>
-<label style="font-size:12px;display:flex;align-items:center;gap:6px;margin:6px 0"><input type="checkbox" id="residency" checked> Data Residency FAIL (EU)</label>
-<label style="font-size:12px;display:flex;align-items:center;gap:6px;margin:6px 0"><input type="checkbox" id="cve" checked> Open CVE Detected</label>
-<button class="btn btn-approve" onclick="runGovernance(false)">Run Governance Pipeline</button>
-
-<div style="margin-top:16px">
-  <div class="vendor-item active" onclick="loadPreset('Apex Cloud Analytics', 120000, 60, false, true, true, true)">
-    <strong>APEX CLOUD ANALYTICS</strong><br><small>$120k • HIGH RISK</small>
-  </div>
-  <div class="vendor-item" style="border-color:#d29922" onclick="loadPreset('Nimbus Data', 45000, 30, true, false, false, false)">
-    <strong>Nimbus Data</strong><br><small>$45k • MEDIUM RISK</small>
-  </div>
-  <div class="vendor-item" style="border-color:#2ea043" onclick="loadPreset('Orion Logistics', 15000, 15, true, true, false, false)">
-    <strong>Orion Logistics</strong><br><small>$15k • LOW RISK</small>
-  </div>
+<div class="card"><b>Vendor Intake Queue</b><p style="font-size:11px;opacity:.7">Vendor Name</p><input id="vn" value="Apex Cloud Analytics"><p style="font-size:11px;opacity:.7">Contract Value ($)</p><input id="cv" type="number" value="120000"><p style="font-size:11px;opacity:.7">Payment Terms (Net Days)</p><input id="pt" type="number" value="60"><label style="font-size:12px"><input type="checkbox" id="soc2"> SOC2 Type II Compliant</label><br><label style="font-size:12px"><input type="checkbox" id="iso" checked> ISO27001 Certified</label><br><label style="font-size:12px"><input type="checkbox" id="dr" checked> Data Residency Violation (EU)</label><br><label style="font-size:12px"><input type="checkbox" id="cve" checked> High Severity Open CVE</label><button class="btn blue" onclick="run()">Run Governance Pipeline</button><div style="margin-top:12px" id="list"><div style="padding:8px;border-left:3px solid #ff4d4d;background:#162040;border-radius:6px;margin-bottom:6px"><b>Apex Cloud Analytics</b><br><small>$120k • HIGH RISK</small></div></div></div>
+<div class="card"><b>AI Risk Reasoning Engine</b><div class="circle-wrap"><div class="circle" id="circle"><div class="score" id="sc">--</div><div class="rlabel">RISK SCORE / 100</div></div></div><small id="rc">Policy Rules Evaluated: 0/12</small><div id="flags" style="margin-top:8px"></div></div>
+<div class="card"><b>Approval & Governance Console</b><div id="status" style="background:#3d1e1e;color:#ff8a8a;padding:5px 10px;border-radius:6px;font-size:11px;margin:8px 0;display:inline-block">PENDING APPROVAL</div><button class="btn yellow" onclick="override()">🛡️ Apply Human Override</button><button class="btn dark" onclick="alert('Vendor ko info request email gaya (Demo)')">Request Additional Info</button><p style="margin-top:14px"><b>Audit & Integrity Provenance</b></p><div class="hash" id="ah">--</div><p><b>Analytics Telemetry</b></p><div class="hash" id="at">--</div><div style="display:flex;gap:8px;margin-top:10px"><button class="btn dark" style="background:#4a2222" onclick="setStatus('REJECTED & ESCALATED')">Reject</button><button class="btn dark" style="background:#1e3a26" onclick="setStatus('APPROVED WITH CONDITIONS')">Approve</button></div><div class="hash" id="wait" style="margin-top:8px;color:#6da8ff">Waiting for execution...</div></div>
 </div>
-</div>
-
-<!-- CENTER: Risk Reasoning -->
-<div class="card">
-<h3>AI Risk Reasoning</h3>
-<div id="dial" class="risk-dial">
-  <div id="score" style="font-size:32px;font-weight:800;line-height:1">--</div>
-  <div style="font-size:10px;color:#8b949e;margin-top:4px">RISK SCORE /100</div>
-</div>
-<div id="flags"></div>
-<div style="margin-top:12px;font-size:12px;color:#8b949e">Policy Rules Evaluated: <span id="rulesCount" style="color:#fff">0/12</span></div>
-<div id="reasoning" style="margin-top:10px;background:#0a0e14;padding:10px;border-radius:8px;font-size:12px;border:1px solid #1f2a36">Select a vendor and run pipeline to view AI reasoning.</div>
-</div>
-
-<!-- RIGHT: Approval Console -->
-<div class="card">
-<h3>Approval Console</h3>
-<div id="statusBadge" style="background:#2a1515;color:#ff7b72;padding:6px 10px;border-radius:6px;display:inline-block;font-size:12px;font-weight:700">PENDING APPROVAL</div>
-<button class="btn btn-override" onclick="runGovernance(true)">🛡️ Human Override</button>
-<button class="btn" style="background:#21262d;color:#fff" onclick="alert('Request sent to vendor for additional documentation.')">Request Additional Info</button>
-<h4 style="margin-top:20px;font-size:13px;color:#8b949e">Audit & Provenance</h4>
-<div style="font-size:11px;word-break:break-all;background:#0a0e14;padding:8px;border-radius:6px;border:1px solid #1f2a36">
-<div style="color:#8b949e">Audit Hash (SHA256)</div>
-<div id="auditHash" style="color:#58a6ff;margin-top:2px">--</div>
-<div id="timestamp" style="margin-top:6px;color:#8b949e">--</div>
-</div>
-<h4 style="margin-top:14px;font-size:13px;color:#8b949e">Analytics Telemetry</h4>
-<div id="telemetry" style="font-size:12px;background:#0a0e14;padding:8px;border-radius:6px;border:1px solid #1f2a36">--</div>
-<div style="margin-top:12px;display:flex;gap:8px">
-<button class="btn" style="background:#2a1515;color:#ff7b72" onclick="alert('Vendor onboarding rejected.')">Reject</button>
-<button class="btn" style="background:#0d2518;color:#2ea043" onclick="alert('Conditional approval recorded.')">Approve</button>
-</div>
-<div id="result">Waiting for execution...</div>
-</div>
-</div>
-
 <script>
-function loadPreset(name, val, terms, soc2, iso, residency, cve) {
-  document.getElementById('vname').value = name;
-  document.getElementById('vvalue').value = val;
-  document.getElementById('vterms').value = terms;
-  document.getElementById('soc2').checked = soc2;
-  document.getElementById('iso').checked = iso;
-  document.getElementById('residency').checked = residency;
-  document.getElementById('cve').checked = cve;
-  runGovernance(false);
+let last=null;
+async function run(){
+ const payload={vendor_name:document.getElementById('vn').value,contract_value:+document.getElementById('cv').value,net_terms:+document.getElementById('pt').value,soc2:document.getElementById('soc2').checked,iso27001:document.getElementById('iso').checked,data_residency_fail:document.getElementById('dr').checked,open_cve:document.getElementById('cve').checked};
+ document.getElementById('wait').innerText='Running governance pipeline...';
+ try{
+  const r=await fetch('/api/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const d=await r.json(); last=d;
+  document.getElementById('sc').innerText=d.risk_assessment.score;
+  document.getElementById('rc').innerText=`Policy Rules Evaluated: ${d.security_integrity.rules_evaluated}/12`;
+  document.getElementById('flags').innerHTML=d.risk_assessment.flags.map(f=>`<div class="flag">⚠️ ${f}</div>`).join('') || '<div class="flag" style="border-color:#2ecc71">✅ No critical flags</div>';
+  setStatus(d.approval_status);
+  document.getElementById('ah').innerText=d.security_integrity.audit_hash_sha256;
+  document.getElementById('at').innerText=`Latency: ${d.analytics_telemetry.latency_ms}ms | RulesVer: ${d.analytics_telemetry.rules_engine_version} | Integrity: ${d.security_integrity.integrity_status}`;
+  document.getElementById('wait').innerText='Execution complete.';
+  document.getElementById('circle').style.borderTopColor=d.risk_assessment.level==='HIGH'?'#ff4d4d':d.risk_assessment.level==='MEDIUM'?'#ffb020':'#2ecc71';
+ }catch(e){document.getElementById('wait').innerText='Error: '+e.message}
 }
-
-async function runGovernance(override=false){
-  const payload = {
-    vendor_name: document.getElementById('vname').value,
-    contract_value_usd: parseInt(document.getElementById('vvalue').value) || 0,
-    payment_terms: parseInt(document.getElementById('vterms').value) || 0,
-    soc2_compliant: document.getElementById('soc2').checked,
-    iso27001: document.getElementById('iso').checked,
-    data_residency_fail: document.getElementById('residency').checked,
-    open_cve_high: document.getElementById('cve').checked
-  };
-
-  document.getElementById('score').innerText = '...';
-  await new Promise(r => setTimeout(r, 400));
-
-  let score = 5;
-  let flags = [];
-  if (!payload.soc2_compliant) { score += 35; flags.push('Missing SOC2 Type II - RULE_002'); }
-  if (payload.payment_terms > 45) { score += 15; flags.push(`Payment Net ${payload.payment_terms} >45 - RULE_003`); }
-  if (payload.data_residency_fail) { score += 25; flags.push('Data Residency FAIL - RULE_004'); }
-  if (payload.open_cve_high) { score += 20; flags.push('Open CVE high severity - RULE_009'); }
-  if (!payload.iso27001) { score += 20; flags.push('Missing ISO27001 - RULE_001'); }
-  score = Math.min(score, 100);
-
-  document.getElementById('score').innerText = score;
-  document.getElementById('dial').style.borderTopColor = score >= 60 ? '#ff7b72' : (score >= 30 ? '#d29922' : '#2ea043');
-  document.getElementById('flags').innerHTML = flags.map(f => `<div class="flag fail">🔴 ${f}</div>`).join('') + `<div class="flag pass">✅ ${12 - flags.length}/12 Rules Passed</div>`;
-  document.getElementById('rulesCount').innerText = `12/12 • ${flags.length} flagged`;
-  
-  const statusBadge = document.getElementById('statusBadge');
-  if (score >= 40 && !override) {
-    statusBadge.innerText = 'PENDING APPROVAL';
-    statusBadge.style.background = '#2a1515';
-    statusBadge.style.color = '#ff7b72';
-  } else {
-    statusBadge.innerText = override ? 'APPROVED (OVERRIDE)' : 'AUTO_CLEARED';
-    statusBadge.style.background = '#0d2518';
-    statusBadge.style.color = '#2ea043';
-  }
-
-  document.getElementById('auditHash').innerText = '9f86d0' + Math.random().toString(16).slice(2, 12) + '...3f4c2d';
-  document.getElementById('timestamp').innerText = new Date().toUTCString();
-  document.getElementById('telemetry').innerHTML = `Latency: ${Math.floor(Math.random()*20+12)}ms<br>Rules Evaluated: 12<br>Verification: VERIFIED_VALID`;
-  document.getElementById('reasoning').innerHTML = `<b>AI Reasoning Summary:</b><br>Evaluated risk as ${score >= 60 ? 'HIGH' : 'MEDIUM'}. ${flags.join(', ')}`;
-  document.getElementById('result').innerText = `Qualified App Run SUCCESS - Risk: ${score}/100`;
+async function override(){
+ if(!last) return alert('Pehle Run Governance karo');
+ const r=await fetch('/api/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({human_override:true})});
+ const d=await r.json(); setStatus('APPROVED (Human Override)'); document.getElementById('ah').innerText=d.security_integrity.audit_hash_sha256;
 }
-</script>
-
-</body>
-</html>
+function setStatus(t){const el=document.getElementById('status'); el.innerText=t; el.style.background=t.includes('REJECT')?'#4a2222':t.includes('PENDING')?'#3d1e1e':'#1e3a26'; el.style.color=t.includes('REJECT')?'#ff8a8a':t.includes('PENDING')?'#ffb0a0':'#8affa0'}
+</script></body></html>

@@ -5,7 +5,9 @@
 Enterprise-grade autonomous AI agent that prevents risky vendor onboarding BEFORE contract signature. Evaluates vendors across 12 compliance policies and enforces human-in-the-loop governance.
 
 ### 🚀 Live Demo
-**Anna App Store:** `anna.partners/@sraveena1992/vendix-ai` (After Publish)
+
+**Live Web:** https://vendix-ai.onrender.com/
+**Anna App Store:** `anna.partners/@sraveena1992/vendix-ai`
 
 ### 🎯 Signature Demo Scenario: The $120k Risky Cloud Vendor
 **Vendor:** Apex Cloud Analytics | $120k Contract | Net 60 Terms | SOC2 Missing | Data Residency FAIL

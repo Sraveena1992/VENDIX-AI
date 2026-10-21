@@ -195,8 +195,6 @@ async function runGovernance(override = false) {
   document.getElementById('result').innerText = `Qualified App Run Status: SUCCESS\nRisk Score: ${score}/100\nApproval State: ${statusBadge.innerText}`;
 }
 
-// Auto-run baseline scenario on load
-window.onload = () => runGovernance(false);
 </script>
 </body>
 </html>
